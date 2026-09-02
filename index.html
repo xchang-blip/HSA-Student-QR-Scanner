@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>HSA Student QR Scanner</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"
+    onerror="this.onerror=null;this.src='https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';"></script>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;font-family:Arial,sans-serif;background:linear-gradient(145deg,#6557e8,#a657c5);color:#24324a}.card{width:min(620px,100%);background:#fff;border-radius:28px;padding:26px;box-shadow:0 20px 55px #251b6266;text-align:center}h1{color:#5144c9;margin:5px 0 8px}.sub{color:#69738a;font-size:18px;margin-bottom:18px}#reader{width:100%;min-height:300px;border-radius:20px;overflow:hidden;background:#111}#reader video{border-radius:20px}button{margin:18px auto 8px;border:0;border-radius:17px;padding:18px 28px;background:#20a464;color:#fff;font-size:21px;font-weight:800;cursor:pointer;box-shadow:0 7px 0 #126b41}button:disabled{opacity:.6;cursor:not-allowed}.msg{min-height:55px;margin-top:13px;padding:13px;border-radius:14px;font-size:18px;font-weight:800}.info{background:#eeecff;color:#5144c9}.ok{background:#ddf7e8;color:#147247}.bad{background:#ffe1e1;color:#a72f38}.small{font-size:13px;color:#7a8293;margin-top:15px}@media(max-width:520px){body{padding:10px}.card{padding:17px}.sub{font-size:16px}#reader{min-height:260px}}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div style="font-size:60px">🎓📷</div>
+    <h1>Student QR Scanner</h1>
+    <div class="sub">Scan your permanent student card to open today’s assignment.</div>
+    <div id="reader"></div>
+    <button id="start">📷 Start Camera</button>
+    <div id="message" class="msg info">Press Start Camera, then choose Allow.</div>
+    <div class="small">Harmony Science Academy • Student Learning Tool</div>
+  </main>
+  <script>
+    const ALLOWED_HOST = 'script.google.com';
+    const ALLOWED_PATH = '/a/macros/harmonytx.org/s/AKfycbzQ716IGnvtvBDSk9jhmXNU43ZXxkXSWFOTP9Hlm0e4YTvifkyxhmd2Ie7IA18-tpnR8A/exec';
+    let scanner=null,done=false;
+    const button=document.getElementById('start'),message=document.getElementById('message');
+    function tell(text,type='info'){message.textContent=text;message.className='msg '+type}
+    button.addEventListener('click',startScanner);
+    async function startScanner(){
+      if(scanner)return;
+      if(typeof Html5Qrcode==='undefined'){tell('Scanner library was blocked by the school network. Please tell your teacher.','bad');return;}
+      button.disabled=true;button.textContent='Starting Camera…';tell('Please choose Allow when the browser asks for camera access.');done=false;
+      try{
+        const cameras=await Html5Qrcode.getCameras();
+        if(!cameras.length)throw new Error('No camera was found.');
+        const preferred=cameras.find(c=>/back|rear|environment/i.test(c.label));
+        scanner=new Html5Qrcode('reader');
+        await scanner.start(preferred?preferred.id:cameras[0].id,{fps:10,qrbox:(w,h)=>{const s=Math.floor(Math.min(w,h)*.72);return{width:s,height:s}},aspectRatio:1},onScan,()=>{});
+        button.textContent='Camera Running';tell('Hold the student QR card inside the square.');
+      }catch(error){scanner=null;button.disabled=false;button.textContent='📷 Try Camera Again';tell('Camera error: '+(error.name||'Error')+' — '+(error.message||'Unable to start camera.'),'bad');}
+    }
+    async function onScan(text){
+      if(done)return;
+      try{
+        const url=new URL(text),token=url.searchParams.get('t')||'';
+        if(url.protocol!=='https:'||url.hostname!==ALLOWED_HOST||url.pathname!==ALLOWED_PATH||!/^[a-f0-9]{64}$/i.test(token))throw new Error('This is not a valid student card.');
+        done=true;tell('Student card found! Opening assignment…','ok');
+        try{await scanner.stop();scanner.clear()}catch(e){}
+        window.location.replace(url.href);
+      }catch(error){done=false;tell('This is not a valid HSA student card. Try again.','bad');}
+    }
+  </script>
+</body>
+</html>
