@@ -22,8 +22,10 @@
   </main>
   <script>
     const ALLOWED_HOST = 'script.google.com';
-    const ALLOWED_PATH = '/a/macros/harmonytx.org/s/AKfycbzQ716IGnvtvBDSk9jhmXNU43ZXxkXSWFOTP9Hlm0e4YTvifkyxhmd2Ie7IA18-tpnR8A/exec';
-    let scanner=null,done=false;
+    const ALLOWED_PATH =
+  '/a/macros/harmonytx.org/s/' +
+  'AKfycbxdTsiS4BoMyCYE1JyYM01sjPg54VKFCgDw32PeEy7jw2AONHRtxpmZVH6TvhvCFxC4NQ' +
+  '/exec';
     const button=document.getElementById('start'),message=document.getElementById('message');
     function tell(text,type='info'){message.textContent=text;message.className='msg '+type}
     button.addEventListener('click',startScanner);
