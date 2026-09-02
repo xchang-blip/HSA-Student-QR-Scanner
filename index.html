@@ -164,13 +164,17 @@
   </main>
 
   <script>
+    /*
+     * Only accept Google Apps Script URLs.
+     */
     const ALLOWED_HOST =
       'script.google.com';
 
-    const ALLOWED_PATH =
-      '/a/macros/harmonytx.org/s/' +
-      'AKfycbx9JtbjTzy1yk93ugvnvuFrjZLajQSrUdn0MR2S5sSpThddhO2uxNMIVURhS5C6XiPs-g' +
-      '/exec';
+    /*
+     * Only accept this verified deployment.
+     */
+    const ALLOWED_DEPLOYMENT_ID =
+      'AKfycbx9JtbjTzy1yk93ugvnvuFrjZLajQSrUdn0MR2S5sSpThddhO2uxNMIVURhS5C6XiPs-g';
 
     let scanner = null;
     let done = false;
@@ -195,14 +199,14 @@
 
     async function startScanner() {
       /*
-       * Prevent repeated Start Camera clicks.
+       * Prevent repeated camera starts.
        */
       if (scanner) {
         return;
       }
 
       /*
-       * Check that the QR scanner library loaded.
+       * Confirm the scanner library loaded.
        */
       if (typeof Html5Qrcode === 'undefined') {
         tell(
@@ -236,7 +240,7 @@
         }
 
         /*
-         * Prefer a rear camera on mobile devices.
+         * Prefer the rear camera on mobile devices.
          */
         const preferredCamera =
           cameras.find(camera => {
@@ -336,17 +340,18 @@
           scannedUrl.searchParams.get('t') || '';
 
         /*
-         * Accept only:
-         * 1. HTTPS
-         * 2. script.google.com
-         * 3. The approved deployment
-         * 4. A 64-character random student token
+         * Accept path variations from Google,
+         * but require the correct deployment ID.
          */
         const validCard =
           scannedUrl.protocol === 'https:' &&
           scannedUrl.hostname === ALLOWED_HOST &&
-          scannedUrl.pathname === ALLOWED_PATH &&
-          /^[a-f0-9]{64}$/i.test(studentToken);
+          scannedUrl.pathname.includes(
+            ALLOWED_DEPLOYMENT_ID
+          ) &&
+          /^[a-f0-9]{64}$/i.test(
+            studentToken
+          );
 
         if (!validCard) {
           throw new Error(
@@ -362,7 +367,7 @@
         );
 
         /*
-         * Stop the camera before leaving.
+         * Stop the camera before redirecting.
          */
         try {
           await scanner.stop();
@@ -374,7 +379,7 @@
         scanner = null;
 
         /*
-         * Open the student assignment.
+         * Open the Apps Script assignment.
          */
         window.location.replace(
           scannedUrl.href
