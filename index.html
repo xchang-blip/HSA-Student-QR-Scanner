@@ -21,12 +21,18 @@
     <div class="small">Harmony Science Academy • Student Learning Tool</div>
   </main>
   <script>
-   const ALLOWED_HOST = 'script.google.com';
+ const ALLOWED_HOST = 'script.google.com';
 
 const ALLOWED_PATH =
   '/a/macros/harmonytx.org/s/' +
-  'AKfycbxdTsiS4BoMyCYE1JyYM01sjPg54VKFCgDw32PeEy7jw2AONHRtxpmZVH6TvhvCFxC4NQ' +
+  'AKfycbx9JtbjTzy1yk93ugvnvuFrjZLajQSrUdn0MR2S5sSpThddhO2uxNMIVURhS5C6XiPs-g' +
   '/exec';
+
+let scanner = null;
+let done = false;
+
+const button = document.getElementById('start');
+const message = document.getElementById('message');
 
 let scanner = null;
 let done = false;
