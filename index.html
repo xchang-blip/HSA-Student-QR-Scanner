@@ -175,11 +175,16 @@
   <script>
     const ALLOWED_HOST = 'script.google.com';
 
-    const ALLOWED_DEPLOYMENT_ID =
-      'AKfycbzsuUMKlngTY4gsBBVbM-LcS5UOs5GRhBgKoiETgmbbwEoa0FL-BFG10RWJ9wCTnqIQGQ';
+const ALLOWED_DEPLOYMENT_ID =
+  'AKfycbzsuUMKlngTY4gsBBVbM-LcS5UOs5GRhBgKoiETgmbbwEoa0FL-BFG10RWJ9wCTnqIQGQ';
 
-    let scanner = null;
-    let done = false;
+const STUDENT_LOGIN_URL =
+  'https://script.google.com/a/macros/harmonytx.org/s/' +
+  ALLOWED_DEPLOYMENT_ID +
+  '/exec';
+
+let scanner = null;
+let done = false;
 
     const button = document.getElementById('start');
     const message = document.getElementById('message');
