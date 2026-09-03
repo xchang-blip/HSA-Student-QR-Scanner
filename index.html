@@ -282,7 +282,7 @@
         const validCard =
           url.protocol === 'https:' &&
           url.hostname === ALLOWED_HOST &&
-          url.pathname.includes(ALLOWED_DEPLOYMENT_ID) &&
+
           /^[a-f0-9]{64}$/i.test(token);
 
         if (!validCard) {
@@ -304,7 +304,11 @@
         }
 
         scanner = null;
-        window.location.replace(url.href);
+       window.location.replace(
+  STUDENT_LOGIN_URL +
+  '?t=' +
+  encodeURIComponent(token)
+);
       } catch (error) {
         done = false;
 
